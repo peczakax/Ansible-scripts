@@ -1,0 +1,114 @@
+- name: Install essential Linux tools
+  hosts: all
+  vars_files:
+    - vault.yml
+  tasks:
+    - name: Ensure apt cache is updated on Linux
+      apt:
+        update_cache: yes
+      when: ansible_os_family == 'Debian'
+
+    - name: Install required packages for Kitware repository
+      apt:
+        name:
+          - ca-certificates
+          - gpg
+          - wget
+        state: present
+      when: ansible_os_family == 'Debian'
+
+    - name: Check and remove existing Kitware keyring if necessary
+      shell: test -f /usr/share/doc/kitware-archive-keyring/copyright || sudo rm /usr/share/keyrings/kitware-archive-keyring.gpg
+      when: ansible_os_family == 'Debian'
+
+    - name: Download Kitware APT key
+      get_url:
+        url: https://apt.kitware.com/keys/kitware-archive-latest.asc
+        dest: /tmp/kitware-archive-latest.asc
+      when: ansible_os_family == 'Debian'
+
+    - name: Add Kitware APT key
+      command: gpg --dearmor -o /usr/share/keyrings/kitware-archive-keyring.gpg /tmp/kitware-archive-latest.asc
+      when: ansible_os_family == 'Debian'
+
+    - name: Add Kitware APT repository
+      command: echo "deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main" | sudo tee /etc/apt/sources.list.d/kitware.list
+      when: ansible_os_family == 'Debian'
+
+    - name: Ensure apt cache is updated after adding Kitware repository
+      apt:
+        update_cache: yes
+      when: ansible_os_family == 'Debian'
+
+    - name: Check available versions of CMake
+      shell: apt-cache madison cmake
+      register: cmake_versions
+      when: ansible_os_family == 'Debian'
+
+    - name: Debug available versions of CMake
+      debug:
+        var: cmake_versions.stdout_lines
+      when: ansible_os_family == 'Debian'
+
+    - name: Install essential tools on Linux
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - gparted
+        - snapd
+        - xsel
+      when: ansible_os_family == 'Debian'
+
+    - name: Install essential dev tools on Linux
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - cmake
+        - git
+        - python3
+        - python3-pip
+        - sqlite3
+        - build-essential
+        - libgl1-mesa-dev
+        - qt6-base-dev
+        - qtcreator
+        - mingw-w64
+      when: ansible_os_family == 'Debian'
+
+    - name: Install essential pip tools on Linux
+      pip:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - requests-credssp
+        - ansible-dev-tools
+      when: ansible_os_family == 'Debian'
+
+    - name: Download SQLiteStudio
+      get_url:
+        url: https://github.com/pawelsalawa/sqlitestudio/releases/download/3.3.3/sqlitestudio-3.3.3.tar.xz
+        dest: /tmp/sqlitestudio-3.3.3.tar.xz
+      when: ansible_os_family == 'Debian'
+
+    - name: Extract SQLiteStudio
+      unarchive:
+        src: /tmp/sqlitestudio-3.3.3.tar.xz
+        dest: /opt/
+        remote_src: yes
+      when: ansible_os_family == 'Debian'
+
+    - name: Create symlink for SQLiteStudio
+      file:
+        src: /opt/SQLiteStudio/sqlitestudio
+        dest: /usr/local/bin/sqlitestudio
+        state: link
+      when: ansible_os_family == 'Debian'
+
+    - name: Install Visual Studio Code on Linux
+      snap:
+        name: code
+        classic: true
+        state: present
+      when: ansible_os_family == 'Debian'

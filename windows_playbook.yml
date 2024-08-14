@@ -1,0 +1,52 @@
+- name: Install essential Windows tools
+  hosts: windows
+  collections:
+    - ansible.windows
+  vars_files:
+    - vault.yml
+  vars:
+    ansible_python_interpreter: C:\Python312\python.exe
+  tasks:
+    - name: Ensure Chocolatey is installed on Windows
+      win_chocolatey:
+        name: chocolatey
+        state: present
+      when: ansible_os_family == 'Windows'
+
+    - name: Check available versions of CMake on Windows
+      win_command: choco search cmake --exact
+      register: cmake_versions_windows
+      when: ansible_os_family == 'Windows'
+
+    - name: Check available versions of CMake on Windows
+      win_command: choco search cmake --exact
+      register: cmake_versions_windows
+      when: ansible_os_family == 'Windows'
+
+    - name: Debug available versions of CMake on Windows
+      debug:
+        var: cmake_versions_windows.stdout_lines
+      when: ansible_os_family == 'Windows'
+
+    - name: Install essential tools on Windows
+      win_chocolatey:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - vscode
+        - git
+        - python
+        - cmake
+        - mingw
+        - qtcreator
+        - sqlite
+        - sqlitestudio
+      when: ansible_os_family == 'Windows'
+
+    - name: Install Ansible development tools
+      win_command: python -m pip install ansible-dev-tools
+      when: ansible_os_family == 'Windows'
+
+    - name: Install pip on Windows
+      win_command: python -m ensurepip --upgrade
+      when: ansible_os_family == 'Windows'
