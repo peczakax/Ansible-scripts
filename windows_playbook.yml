@@ -1,7 +1,5 @@
 - name: Install essential Windows tools
   hosts: windows
-  collections:
-    - ansible.windows
   vars_files:
     - vault.yml
   vars:
@@ -37,16 +35,20 @@
         - git
         - python
         - cmake
-        - mingw
         - qtcreator
         - sqlite
         - sqlitestudio
       when: ansible_os_family == 'Windows'
 
-    - name: Install Ansible development tools
-      win_command: python -m pip install ansible-dev-tools
-      when: ansible_os_family == 'Windows'
 
-    - name: Install pip on Windows
+    - name: Install pip
       win_command: python -m ensurepip --upgrade
       when: ansible_os_family == 'Windows'
+
+    - name: Upgrade pip
+      win_command: python -m pip install --upgrade pip
+      when: ansible_os_family == 'Windows'
+
+    - name: Install Python development tools
+      win_command: python -m pip install ansible-dev-tools pybind11 setuptools pytest
+      when: ansible_os_family == 'Windows'      
