@@ -1,0 +1,68 @@
+- hosts: all
+  tasks:
+  - name: Install python for Windows
+    win_chocolatey:
+      name: "{{ item }}"
+      state: present
+    loop:
+      - python
+    when: ansible_os_family == 'Windows'
+
+  - name: Create Python virtual environment on Windows
+    win_command: python.exe -m venv ./.venv
+    args:
+      chdir: .
+    when: ansible_os_family == 'Windows'
+
+  - name: Install pip for Windows
+    win_command: ./.venv/Scripts/python.exe -m ensurepip --upgrade
+    args:
+      chdir: .
+    when: ansible_os_family == 'Windows'
+    
+  - name: Install python for Linux
+    apt:
+      name: "{{ item }}"
+      state: present
+    loop:
+      - python3
+      - python3-pip
+      - python3-venv
+      - python3-virtualenv
+    when: ansible_os_family == 'Debian'
+    become: yes
+    become_method: sudo
+    become_user: root
+
+  - name: Create Python virtual environment on Linux
+    command: python -m venv ./.venv
+    args:
+      chdir: .
+    when: ansible_os_family == 'Debian'
+
+  - name: Install pip for Linux
+    command: ./.venv/bin/pip install --upgrade pip
+    args:
+      chdir: .
+    when: ansible_os_family == 'Debian'
+
+  - name: Install essential pip tools on Linux
+    pip:
+      name: "{{ item }}"
+      virtualenv: ./.venv
+      chdir: .
+      state: present        
+    loop:
+      - ansible
+      - requests
+      - requests-credssp
+      - pywinrm
+      - pywinrm[credssp]
+    when: ansible_os_family == 'Debian'
+
+    # needs to be installed after `pip install ansible`
+  - name: Install Ansible Windows Collection
+    ansible.builtin.command:
+      cmd: ansible-galaxy collection install ansible.windows
+      chdir: .
+    when: ansible_os_family == 'Debian'
