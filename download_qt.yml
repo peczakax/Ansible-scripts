@@ -10,6 +10,6 @@
   
     - name: Download Qt6 installer for Linux
       win_get_url:
-        url: "https://download.qt.io/official_releases/online_installers/PLACE_YOUR_FILE_HERE"
+        url: "https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run"
         dest: '{{ ansible_env.USERPROFILE }}\Downloads\qt-installer.exe'
       when: ansible_os_family == 'Debian'
