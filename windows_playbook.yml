@@ -1,9 +1,6 @@
 - name: Install essential Windows tools
   hosts: windows
   vars_files:
-    - vault.yml
-  vars:
-    ansible_python_interpreter: C:\Python312\python.exe
   tasks:
     - name: Ensure Chocolatey is installed on Windows
       win_chocolatey:
@@ -40,7 +37,6 @@
         - sqlitestudio
       when: ansible_os_family == 'Windows'
 
-
     - name: Install pip
       win_command: python -m ensurepip --upgrade
       when: ansible_os_family == 'Windows'
@@ -52,4 +48,4 @@
     # packages should be installed in python .env rather than globally
     - name: Install Python development tools
       win_command: python -m pip install pybind11 setuptools pytest
-      when: ansible_os_family == 'Windows'      
+      when: ansible_os_family == 'Windows'

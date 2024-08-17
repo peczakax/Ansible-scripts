@@ -1,7 +1,6 @@
 - name: Install essential Linux tools
   hosts: all
   vars_files:
-    - vault.yml
   tasks:
     - name: Ensure apt cache is updated on Linux
       apt:
@@ -77,6 +76,11 @@
         - mingw-w64
       when: ansible_os_family == 'Debian'
 
+    - name: Upgrade pip
+      command: python3 -m pip install --upgrade pip
+      when: ansible_os_family == 'Debian'
+
+    # packages should be installed in python .env rather than globally
     - name: Install essential pip tools on Linux
       pip:
         name: "{{ item }}"
@@ -84,7 +88,22 @@
       loop:
         - requests-credssp
         - ansible-dev-tools
+        - ansible
+        - pybind11
+        - setuptools
+        - pytest
+        - pywinrm
+        - pywinrm[credssp]
       when: ansible_os_family == 'Debian'
+
+    - name: Upgrade pip packages
+      command: python3 -m pip install --upgrade ansible ansible-dev-tools requests-credssp pybind11 setuptools pytest      
+      when: ansible_os_family == 'Debian'
+
+    # needs to be installed after `pip install ansible`
+    - name: Install Ansible Windows Collection
+      ansible.builtin.command:
+        cmd: ansible-galaxy collection install ansible.windows
 
     - name: Download SQLiteStudio
       get_url:
