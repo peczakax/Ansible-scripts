@@ -1,0 +1,42 @@
+- name: Install Visual Studio Community
+  hosts: all
+  tasks:
+    - name: Ensure Downloads directory exists
+      win_file:
+        path: '{{ ansible_env.USERPROFILE }}\Downloads'
+        state: directory
+      when: ansible_os_family == 'Windows'
+
+    - name: Download Visual Studio Community 2019 installer
+      win_get_url:
+        url: https://aka.ms/vs/16/release/vs_community.exe
+        dest: '{{ ansible_env.USERPROFILE }}\Downloads\vs19_community.exe'
+      when: ansible_os_family == 'Windows'
+    
+    - name: Install Visual Studio Community 2019
+      win_command: '{{ ansible_env.USERPROFILE }}\Downloads\vs19_community.exe --quiet --wait --norestart --nocache'
+      register: vs19_install_result
+      ignore_errors: yes
+      when: ansible_os_family == 'Windows'
+
+    - name: Debug Visual Studio 2019 installation result
+      debug:
+        var: vs19_install_result
+      when: ansible_os_family == 'Windows'
+
+    - name: Download Visual Studio Community 2022 installer
+      win_get_url:
+        url: https://aka.ms/vs/17/release/vs_community.exe
+        dest: '{{ ansible_env.USERPROFILE }}\Downloads\vs22_community.exe'
+      when: ansible_os_family == 'Windows'
+    
+    - name: Install Visual Studio Community 2022
+      win_command: '{{ ansible_env.USERPROFILE }}\Downloads\vs22_community.exe --quiet --wait --norestart --nocache'
+      register: vs22_install_result
+      ignore_errors: yes
+      when: ansible_os_family == 'Windows'
+
+    - name: Debug Visual Studio 2022 installation result
+      debug:
+        var: vs22_install_result
+      when: ansible_os_family == 'Windows'
