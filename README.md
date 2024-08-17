@@ -34,7 +34,7 @@ Install open SSH server i.e. <https://ubuntu.com/server/docs/openssh-server>
 
 Run the script on your control node to start the process:
 
-    ansible-playbook -i linventory.txt linux_playbook.yml --become --become-method=sudo --become-user=root --ask-vault-password
+    ansible-playbook -i linventory.txt linux_playbook.yml --become --become-method=sudo --become-user=root --ask-become-pass
 
 ## Windows 11 Installation
 
@@ -212,4 +212,4 @@ Save and close the file. Ansible Vault will encrypt the file using the password 
 
 Run the script on your control node to start the process:
 
-    ansible-playbook -i winventory.txt windows_playbook.yml --become-method=runas --become-user=Administrator --ask-vault-password
+    ansible-playbook -i winventory.txt windows_playbook.yml --become-method=runas --become-user=Administrator --ask-become-pass
