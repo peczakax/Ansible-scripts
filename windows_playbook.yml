@@ -49,6 +49,7 @@
       win_command: python -m pip install --upgrade pip
       when: ansible_os_family == 'Windows'
 
+    # packages should be installed in python .env rather than globally
     - name: Install Python development tools
-      win_command: python -m pip install ansible-dev-tools pybind11 setuptools pytest
+      win_command: python -m pip install pybind11 setuptools pytest
       when: ansible_os_family == 'Windows'      
